@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from tempfile import NamedTemporaryFile
 
 from google.oauth2 import service_account
 from google.cloud import storage
@@ -54,15 +55,47 @@ class GcpService:
 
         :param bucket_name: The name of the storage bucket to retrieve
         :return: The storage bucket or None
-        :return: An iterator of blobs or None
         """
         bucket = None
-        blobs = None
         storage_client = self._get_storage_client()
         bucket = storage_client.lookup_bucket(bucket_name)
-        if bucket:
-            blobs = storage_client.list_blobs(bucket_name)
-        return bucket, blobs
+        return bucket
+
+    def list_blobs_in_storage_bucket(self, bucket_name, prefix):
+        """Get all blobs in a storage bucket with the given prefix.
+
+        :param bucket_name: The name of the storage bucket to list blobs from
+        :param prefix: The prefix to filter blobs on
+        :return: The blobs or None
+        """
+        storage_client = self._get_storage_client()
+        return storage_client.list_blobs(bucket_name, prefix=prefix)
+
+    def download_latest_cost_report(self, bucket_name, prefix, destination=None):
+        """Download the latest cost report to the given file path
+
+        :param bucket_name: The name of the storage bucket to list blobs from
+        :param prefix: The prefix to filter blobs on
+        :param destination: The location to download the cost report to
+        :return: True if download is successful, else False
+        """
+        latest = None
+        storage_client = self._get_storage_client()
+        blobs = self.list_blobs_in_storage_bucket(bucket_name, prefix=prefix)
+        for blob in blobs:
+            if latest is None:
+                latest = blob
+                break
+            if latest.updated > blob.updated:
+                latest = blob
+        if latest:
+            file_path = destination
+            if not destination:
+                temp_file = NamedTemporaryFile(delete=False, suffix='.csv')
+                file_path = temp_file.name
+            latest.download_to_filename(file_path, client=storage_client)
+
+        return file_path
 
     def delete_storage_bucket(self, bucket_name):
         """Delete the storage bucket by name.

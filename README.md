@@ -1,8 +1,8 @@
 # gcp-cost-mgmt-access
-Proof of concept code to setup an cost mgmt data extraction and pull data file. 
+Proof of concept code to extract cost management data files. 
 
 ## Background
-The sample code here is meant to setup Billing export to a file as described in this [Google Cloud Platform (GCP) document](https://cloud.google.com/billing/docs/how-to/export-data-file) and provide code to extract and read the report data once downloaded.
+The sample code here is meant to work with the Billing export to a file as described in this [Google Cloud Platform (GCP) document](https://cloud.google.com/billing/docs/how-to/export-data-file) and provide code to extract and read the report data once downloaded. It is not currently possible to programattically setup Billing export to a file, so users must perform this step and provide the necessary data for the storage bucket and cost report prefix.
 
 ## Getting Started
 
@@ -20,7 +20,7 @@ pipenv install
 3. Create a service account
 Follow the steps in the following GCP document to [create a service account](https://cloud.google.com/iam/docs/creating-managing-service-accounts)
 
-Add the following roles to the service account: _Storage Admin_, _Role2_, and _Role3_.
+Add the following role to the service account: _Storage Admin_.
 
 
 4. Set environment variables

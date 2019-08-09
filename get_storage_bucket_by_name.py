@@ -7,12 +7,10 @@ def main():
     storage_bucket = os.environ.get(
         'STORAGE_BUCKET', 'costmgmtacct1234')
     gcp = GcpService()
-    bucket, blobs = gcp.get_storage_bucket(storage_bucket)
+    bucket = gcp.get_storage_bucket(storage_bucket)
 
     if bucket:
         print(f'{storage_bucket}={bucket}')
-        for blob in blobs:
-            print(f'blob={blob}')
     else:
         print(f'Failed to retrieve storage bucket {storage_bucket}.')
 
